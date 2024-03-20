@@ -1,30 +1,13 @@
 module Main where
 
+import Card
 import Data.Char (toLower)
 import Data.List (intercalate)
 import Data.Maybe (maybeToList)
 import System.Random.Shuffle (shuffleM)
 
-data Suit = Heart | Club | Spade | Diamond deriving (Show, Eq)
-
-data Value = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King deriving (Eq)
-
-instance Show Value where
-  show Ace = "Ace"
-  show Two = "2"
-  show Three = "3"
-  show Four = "4"
-  show Five = "5"
-  show Six = "6"
-  show Seven = "7"
-  show Eight = "8"
-  show Nine = "9"
-  show Ten = "10"
-  show Jack = "Jack"
-  show Queen = "Queen"
-  show King = "King"
-
-newtype Card = Card (Value, Suit)
+shuffledDeck :: IO [Card]
+shuffledDeck = shuffleM initialDeck
 
 valueOf :: Card -> (Integer, Maybe Integer)
 valueOf (Card (value, _)) = case value of
@@ -38,25 +21,6 @@ valueOf (Card (value, _)) = case value of
   Eight -> (8, Nothing)
   Nine -> (9, Nothing)
   _ -> (10, Nothing)
-
-initialDeck :: [Card]
-initialDeck =
-  [ Card (value, suit)
-    | value <- [Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King],
-      suit <- [Heart, Diamond, Spade, Club]
-  ]
-
-shuffledDeck :: IO [Card]
-shuffledDeck = shuffleM initialDeck
-
-instance Show Card where
-  show (Card (value, suit)) =
-    concat
-      [ show value,
-        " of ",
-        show suit,
-        "s"
-      ]
 
 data GameState = GameState
   { playerHand :: [Card],
