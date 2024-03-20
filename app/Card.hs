@@ -1,4 +1,4 @@
-module Card (Card (..), Suit (..), Value (..), initialDeck) where
+module Card (Card (..), Suit (..), Value (..), initialDeck, valueOf) where
 
 data Suit = Heart | Club | Spade | Diamond deriving (Show, Eq)
 
@@ -27,6 +27,19 @@ initialDeck =
     | value <- [Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King],
       suit <- [Heart, Diamond, Spade, Club]
   ]
+
+valueOf :: Card -> (Integer, Maybe Integer)
+valueOf (Card (value, _)) = case value of
+  Ace -> (1, Just 11)
+  Two -> (2, Nothing)
+  Three -> (3, Nothing)
+  Four -> (4, Nothing)
+  Five -> (5, Nothing)
+  Six -> (6, Nothing)
+  Seven -> (7, Nothing)
+  Eight -> (8, Nothing)
+  Nine -> (9, Nothing)
+  _ -> (10, Nothing)
 
 instance Show Card where
   show (Card (value, suit)) =
