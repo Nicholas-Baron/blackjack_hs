@@ -1,27 +1,9 @@
 module Main where
 
-import Control.Monad
-import Data.Array.IO
 import Data.Char (toLower)
 import Data.List (intercalate)
 import Data.Maybe (maybeToList)
-import System.Random
-
--- | Randomly shuffle a list
---   /O(N)/
-shuffle :: [a] -> IO [a]
-shuffle xs = do
-  ar <- newArray n xs
-  forM [1 .. n] $ \i -> do
-    j <- randomRIO (i, n)
-    vi <- readArray ar i
-    vj <- readArray ar j
-    writeArray ar j vi
-    return vj
-  where
-    n = length xs
-    newArray :: Int -> [a] -> IO (IOArray Int a)
-    newArray n = newListArray (1, n)
+import System.Random.Shuffle (shuffleM)
 
 data Suit = Heart | Club | Spade | Diamond deriving (Show, Eq)
 
@@ -65,7 +47,7 @@ initialDeck =
   ]
 
 shuffledDeck :: IO [Card]
-shuffledDeck = shuffle initialDeck
+shuffledDeck = shuffleM initialDeck
 
 instance Show Card where
   show (Card (value, suit)) =
