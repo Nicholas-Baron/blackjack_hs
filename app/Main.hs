@@ -51,11 +51,13 @@ playRound state = do
   afterInputs <- handleInput (setupState state)
   maybe
     (putStrLn "Bye!")
-    ( \playerDoneState -> do
-        printWinner (endPlayerRound playerDoneState)
-        shuffledDeck >>= playRound . fromStartingDeck
+    ( \playerDoneState ->
+        printWinner (endPlayerRound playerDoneState) >> newRound
     )
     afterInputs
 
+newRound :: IO ()
+newRound = shuffledDeck >>= playRound . fromStartingDeck
+
 main :: IO ()
-main = shuffledDeck >>= playRound . fromStartingDeck
+main = newRound
