@@ -13,14 +13,19 @@ printHandValue hand = do
   print $ "Hand: " ++ show hand
   print $ "Total Value: " ++ intercalate " or " (map show $ valueOfHand hand)
 
+hasPlayerWonOrLost :: GameState -> Maybe Bool
+hasPlayerWonOrLost state =
+  let playerValues = valueOfPlayerHand state
+   in if 21 `elem` playerValues then Just True else if not (any (< 21) playerValues) then Just False else Nothing
+
 handleInput :: GameState -> IO (Maybe GameState)
 handleInput state = do
   putStrLn $ "Dealer has " ++ show (dealerTopCard state)
   printHandValue $ playerHand state
-  case minimum (valueOfPlayerHand state) `compare` 21 of
-    EQ -> putStrLn "21" >> return (Just state)
-    GT -> putStrLn "Bust" >> return (Just state)
-    LT -> do
+  case hasPlayerWonOrLost state of
+    Just True -> return (Just state)
+    Just False -> putStrLn "Bust" >> return (Just state)
+    Nothing -> do
       userInput <- getLine
       case parseAction userInput of
         Nothing -> do
