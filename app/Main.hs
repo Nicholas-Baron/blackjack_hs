@@ -47,12 +47,15 @@ printWinner state = do
 playRound :: GameState -> IO ()
 playRound state = do
   let setupState = dealerPlay . playerHit . dealerPlay . playerHit
+
   afterInputs <- handleInput (setupState state)
-  case afterInputs of
-    Nothing -> print "Bye!"
-    Just state -> do
-      printWinner (endPlayerRound state)
-      shuffledDeck >>= playRound . fromStartingDeck
+  maybe
+    (putStrLn "Bye!")
+    ( \playerDoneState -> do
+        printWinner (endPlayerRound playerDoneState)
+        shuffledDeck >>= playRound . fromStartingDeck
+    )
+    afterInputs
 
 main :: IO ()
 main = shuffledDeck >>= playRound . fromStartingDeck
