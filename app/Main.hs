@@ -15,17 +15,16 @@ printHandValue hand = do
 
 handleInput :: GameState -> IO (Maybe GameState)
 handleInput state = do
-  print $ "Dealer has " ++ show (dealerTopCard state)
+  putStrLn $ "Dealer has " ++ show (dealerTopCard state)
   printHandValue $ playerHand state
-  if minimum (valueOfPlayerHand state) > 21
-    then do
-      print "Bust"
-      return (Just state)
-    else do
+  case minimum (valueOfPlayerHand state) `compare` 21 of
+    EQ -> putStrLn "21" >> return (Just state)
+    GT -> putStrLn "Bust" >> return (Just state)
+    LT -> do
       userInput <- getLine
       case parseAction userInput of
         Nothing -> do
-          print "Enter one of the following (case insensitive): Hit, Stay, Quit"
+          putStrLn "Enter one of the following (case insensitive): Hit, Stay, Quit"
           handleInput state
         Just Quit -> return Nothing
         Just Hit -> handleInput (playerHit state)
