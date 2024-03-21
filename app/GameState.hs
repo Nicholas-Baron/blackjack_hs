@@ -58,7 +58,7 @@ endPlayerRound inputState@GameState {deck, playerHand, dealerHand} =
         else inputState
 
 valueOfPlayerHand :: GameState -> [Integer]
-valueOfPlayerHand = valueOfHand . dealerHand
+valueOfPlayerHand = valueOfHand . playerHand
 
 valueOfDealerHand :: GameState -> [Integer]
 valueOfDealerHand = valueOfHand . dealerHand
