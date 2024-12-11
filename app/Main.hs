@@ -2,9 +2,9 @@ module Main where
 
 import Card
 import Data.List (intercalate)
+import Data.Maybe (fromJust)
 import GameState
 import System.Random.Shuffle (shuffleM)
-import Data.Maybe (fromJust)
 
 shuffledDeck :: IO [Card]
 shuffledDeck = shuffleM initialDeck
@@ -40,6 +40,8 @@ printWinner :: GameState -> IO ()
 printWinner state = do
   let playerValues = filter (<= 21) $ valueOfPlayerHand state
       dealerValues = filter (<= 21) $ valueOfDealerHand state
+
+  putStrLn $ concat ["Dealer has ", show $ dealerHand state]
 
   print $ case (playerValues, dealerValues) of
     ([], _) -> "Dealer won"

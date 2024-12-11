@@ -6,6 +6,7 @@ module GameState
     endPlayerRound,
     dealerTopCard,
     playerHand,
+    dealerHand,
     valueOfHand,
     valueOfDealerHand,
     valueOfPlayerHand,
