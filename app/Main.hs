@@ -41,7 +41,7 @@ printWinner state = do
 
   putStrLn $ concat ["Dealer has ", showHand $ dealerHand state]
 
-  print $ case (playerValues, dealerValues) of
+  putStrLn $ case (playerValues, dealerValues) of
     ([], _) -> "Dealer won"
     (_, []) -> "You won!"
     _ -> case maximum playerValues `compare` maximum dealerValues of
