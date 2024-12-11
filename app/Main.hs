@@ -12,15 +12,23 @@ shuffledDeck = shuffleM initialDeck
 showHand :: [Card] -> String
 showHand = intercalate ", " . map show
 
-printHandValue :: [Card] -> IO ()
-printHandValue hand = do
-  putStrLn $ "Hand: " ++ showHand hand
-  putStrLn $ "Total Value: " ++ intercalate " or " (map show $ valueOfHand hand)
+showValues :: [Card] -> String
+showValues = intercalate " or " . map show . valueOfHand
+
+printHandValue :: String -> [Card] -> IO ()
+printHandValue prefix hand =
+  putStrLn $
+    concat
+      [ prefix,
+        ' ' : showHand hand,
+        "\nValue: ",
+        showValues hand
+      ]
 
 handleInput :: GameState -> IO (Maybe GameState)
 handleInput state = do
   putStrLn $ "Dealer has " ++ show (dealerTopCard state)
-  printHandValue $ playerHand state
+  printHandValue "You have" $ playerHand state
   case hasPlayerWonOrLost state of
     Just True -> return (Just state)
     Just False -> putStrLn "Bust" >> return (Just state)
@@ -39,7 +47,7 @@ printWinner state = do
   let playerValues = filter (<= 21) $ valueOfPlayerHand state
       dealerValues = filter (<= 21) $ valueOfDealerHand state
 
-  putStrLn $ concat ["Dealer has ", showHand $ dealerHand state]
+  printHandValue "Dealer's final hand" $ dealerHand state
 
   putStrLn $ case (playerValues, dealerValues) of
     ([], _) -> "Dealer won"
