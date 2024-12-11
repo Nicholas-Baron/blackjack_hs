@@ -9,9 +9,12 @@ import System.Random.Shuffle (shuffleM)
 shuffledDeck :: IO [Card]
 shuffledDeck = shuffleM initialDeck
 
+showHand :: [Card] -> String
+showHand = intercalate ", " . map show
+
 printHandValue :: [Card] -> IO ()
 printHandValue hand = do
-  putStrLn $ "Hand: " ++ show hand
+  putStrLn $ "Hand: " ++ showHand hand
   putStrLn $ "Total Value: " ++ intercalate " or " (map show $ valueOfHand hand)
 
 handleInput :: GameState -> IO (Maybe GameState)
@@ -36,7 +39,7 @@ printWinner state = do
   let playerValues = filter (<= 21) $ valueOfPlayerHand state
       dealerValues = filter (<= 21) $ valueOfDealerHand state
 
-  putStrLn $ concat ["Dealer has ", show $ dealerHand state]
+  putStrLn $ concat ["Dealer has ", showHand $ dealerHand state]
 
   print $ case (playerValues, dealerValues) of
     ([], _) -> "Dealer won"
