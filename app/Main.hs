@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Main where
 
 import Card
@@ -25,22 +27,28 @@ printHandValue prefix hand =
         showValues hand
       ]
 
-handleInput :: GameState -> IO (Maybe GameState)
+data EndOfPlayerTurn
+  = EndGame
+  | PlayerBust GameState
+  | PlayerWait GameState
+  | PlayerWin GameState
+
+handleInput :: GameState -> IO EndOfPlayerTurn
 handleInput state = do
   putStrLn $ "Dealer has " ++ show (dealerTopCard state)
   printHandValue "You have" $ playerHand state
   case hasPlayerWonOrLost state of
-    Just True -> return (Just state)
-    Just False -> putStrLn "Bust" >> return (Just state)
+    Just True -> return (PlayerWin state)
+    Just False -> putStrLn "Bust" >> return (PlayerBust state)
     Nothing -> do
       userInput <- getLine
       case parseAction userInput of
         Nothing -> do
           putStrLn "Enter one of the following (case insensitive): Hit, Stay, Quit"
           handleInput state
-        Just Quit -> return Nothing
+        Just Quit -> return EndGame
         Just Hit -> handleInput (playerHit state)
-        Just Stay -> return (Just state)
+        Just Stay -> return (PlayerWait state)
 
 printWinner :: GameState -> IO ()
 printWinner state = do
@@ -60,12 +68,11 @@ printWinner state = do
 playRound :: GameState -> IO ()
 playRound state =
   let setupState = dealerPlay . playerHit . dealerPlay . playerHit
-   in handleInput (setupState state)
-        >>= maybe
-          (putStrLn "Bye!")
-          ( \playerDoneState ->
-              printWinner (endPlayerRound playerDoneState) >> newRound
-          )
+   in handleInput (setupState state) >>= \case
+        EndGame -> putStrLn "Bye!"
+        PlayerWait state -> printWinner (endPlayerRound state) >> newRound
+        PlayerBust state -> printWinner (endPlayerRound state) >> newRound
+        PlayerWin state -> printWinner (endPlayerRound state) >> newRound
 
 newRound :: IO ()
 newRound = shuffledDeck >>= playRound . fromJust . fromStartingDeck
