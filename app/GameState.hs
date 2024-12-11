@@ -16,16 +16,21 @@ where
 
 import Card
 import Data.Char (toLower)
+import Data.List.NonEmpty (NonEmpty ((:|)))
+import Data.List.NonEmpty qualified as NE
 import Data.Maybe (listToMaybe, maybeToList)
 
 data GameState = GameState
   { playerHand :: [Card],
     dealerHand :: [Card],
-    deck :: [Card]
+    deck :: NonEmpty Card
   }
 
-fromStartingDeck :: [Card] -> GameState
-fromStartingDeck deck =
+fromStartingDeck :: [Card] -> Maybe GameState
+fromStartingDeck = fmap fromNonEmptyDeck . NE.nonEmpty
+
+fromNonEmptyDeck :: NonEmpty Card -> GameState
+fromNonEmptyDeck deck =
   GameState
     { playerHand = [],
       dealerHand = [],
@@ -34,9 +39,9 @@ fromStartingDeck deck =
 
 playerHit :: GameState -> GameState
 playerHit (GameState {deck, playerHand, dealerHand}) =
-  let (toPlayer : rest) = deck
+  let (toPlayer :| rest) = deck
    in GameState
-        { deck = rest,
+        { deck = NE.fromList rest,
           dealerHand = dealerHand,
           playerHand = toPlayer : playerHand
         }
@@ -47,14 +52,14 @@ dealerTopCard GameState {dealerHand} =
 
 dealerPlay :: GameState -> GameState
 dealerPlay (GameState {deck, playerHand, dealerHand}) =
-  let (toDealer : rest) = deck in GameState {deck = rest, playerHand = playerHand, dealerHand = toDealer : dealerHand}
+  let (toDealer :| rest) = deck in GameState {deck = NE.fromList rest, playerHand = playerHand, dealerHand = toDealer : dealerHand}
 
 endPlayerRound :: GameState -> GameState
 endPlayerRound inputState@GameState {deck, playerHand, dealerHand} =
-  let (nextCard : rest) = deck
+  let (nextCard :| rest) = deck
       canTake = (< 18) . minimum . valueOfHand
    in if canTake dealerHand
-        then endPlayerRound GameState {deck = rest, dealerHand = nextCard : dealerHand, playerHand = playerHand}
+        then endPlayerRound GameState {deck = NE.fromList rest, dealerHand = nextCard : dealerHand, playerHand = playerHand}
         else inputState
 
 valueOfPlayerHand :: GameState -> [Integer]

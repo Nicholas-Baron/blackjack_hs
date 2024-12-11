@@ -4,6 +4,7 @@ import Card
 import Data.List (intercalate)
 import GameState
 import System.Random.Shuffle (shuffleM)
+import Data.Maybe (fromJust)
 
 shuffledDeck :: IO [Card]
 shuffledDeck = shuffleM initialDeck
@@ -59,7 +60,7 @@ playRound state =
           )
 
 newRound :: IO ()
-newRound = shuffledDeck >>= playRound . fromStartingDeck
+newRound = shuffledDeck >>= playRound . fromJust . fromStartingDeck
 
 main :: IO ()
 main = newRound
