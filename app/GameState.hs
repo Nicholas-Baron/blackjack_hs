@@ -12,6 +12,7 @@ module GameState
     valueOfPlayerHand,
     PlayerAction (..),
     parseAction,
+    hasPlayerWonOrLost,
   )
 where
 
@@ -55,11 +56,21 @@ dealerPlay :: GameState -> GameState
 dealerPlay (GameState {deck, playerHand, dealerHand}) =
   let (toDealer :| rest) = deck in GameState {deck = NE.fromList rest, playerHand = playerHand, dealerHand = toDealer : dealerHand}
 
+hasPlayerWonOrLost :: GameState -> Maybe Bool
+hasPlayerWonOrLost state =
+  let playerValues = valueOfPlayerHand state
+   in if 21 `elem` playerValues
+        then Just True
+        else
+          if not (any (< 21) playerValues)
+            then Just False
+            else Nothing
+
 endPlayerRound :: GameState -> GameState
 endPlayerRound inputState@GameState {deck, playerHand, dealerHand} =
   let (nextCard :| rest) = deck
       canTake = (< 18) . minimum . valueOfHand
-   in if canTake dealerHand
+   in if canTake dealerHand && hasPlayerWonOrLost inputState == Just False
         then endPlayerRound GameState {deck = NE.fromList rest, dealerHand = nextCard : dealerHand, playerHand = playerHand}
         else inputState
 
