@@ -18,6 +18,7 @@ where
 
 import Card
 import Data.Char (toLower)
+import Data.List (nub)
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.List.NonEmpty qualified as NE
 import Data.Maybe (listToMaybe, maybeToList)
@@ -81,7 +82,7 @@ valueOfDealerHand :: GameState -> [Integer]
 valueOfDealerHand = valueOfHand . dealerHand
 
 valueOfHand :: [Card] -> [Integer]
-valueOfHand = foldl valueAdder []
+valueOfHand = nub . foldl valueAdder []
   where
     valueAdder :: [Integer] -> Card -> [Integer]
     valueAdder [] c = let (val1, val2) = valueOf c in val1 : maybeToList val2
