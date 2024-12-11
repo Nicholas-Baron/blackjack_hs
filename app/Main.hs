@@ -11,8 +11,8 @@ shuffledDeck = shuffleM initialDeck
 
 printHandValue :: [Card] -> IO ()
 printHandValue hand = do
-  print $ "Hand: " ++ show hand
-  print $ "Total Value: " ++ intercalate " or " (map show $ valueOfHand hand)
+  putStrLn $ "Hand: " ++ show hand
+  putStrLn $ "Total Value: " ++ intercalate " or " (map show $ valueOfHand hand)
 
 handleInput :: GameState -> IO (Maybe GameState)
 handleInput state = do
